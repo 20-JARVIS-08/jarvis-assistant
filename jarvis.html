@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. Assistant</title>
+    <link rel="icon" href="Jarvis.ico">
+    <style>
+        body,
+        html {
+            height: 100%;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #111111;
+            color: #0ff;
+            /* background-image: url('J.A.R.V.I.S_wallpaper.gif');
+            background-clip: unset;
+            backdrop-filter: initial;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover; */
+        }
+
+        .container {
+            position: absolute;
+            left: 50%;
+            bottom: 50%;
+            transform: translate(-50%, 50%);
+            margin-top: 50px;
+        }
+
+        .output {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #0ff;
+            display: inline-block;
+            min-height: 50px;
+            width: 300px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #0ff;
+            border: none;
+            cursor: pointer;
+        }
+
+        #music-btn {
+            padding: 10px 20px;
+            background-color: #0ff;
+            color: #000;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            display: none;
+            /* دکمه اول دیده نشه */
+            margin-top: 30px;
+            z-index: 5;
+        }
+
+        .pulse {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: #0ff;
+            box-shadow: 0 0 15px #0ff;
+            animation: pulse 2s infinite;
+            z-index: -1;
+            display: none;
+            /* فقط وقتی پخش بشه نشون بده */
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.5);
+                opacity: 0.4;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+
+        @media (max-width: 480px) {
+
+            html,
+            body {
+                background-image: url('9c046e14e6ca7754d21dcd5c0deceea6.gif');
+                background-position: center;
+                background-repeat: no-repeat;
+                background-size: cover;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>J.A.R.V.I.S. AI Assistant</h1>
+        <button onclick="startListening()">Talk to J.A.R.V.I.S.</button>
+        <div class="output" id="output">Listening...</div>
+
+        <button id="music-btn" style="display: none;" onclick="toggleMusic(false)">Pause Music</button>
+
+        <audio id="bg-music" loop>
+            <source src="back-in-black.mp3" type="audio/mp3">
+        </audio>
+
+        <div class="pulse" id="music-visual"></div>
+    </div>
+
+    <script>
+        function startListening() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = 'en-US';
+            recognition.start();
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                document.getElementById('output').textContent = "You said: " + transcript;
+                respondToCommand(transcript);
+            };
+
+            recognition.onerror = function (event) {
+                console.error('Speech Recognition Error:', event.error);
+                document.getElementById('output').textContent = "Error recognizing speech: " + event.error;
+            };
+        }
+
+        function toggleMusic(play = true) {
+            const audio = document.getElementById("bg-music");
+            const visual = document.getElementById("music-visual");
+            const button = document.getElementById("music-btn");
+
+            if (play) {
+                if (audio.paused) {
+                    audio.play().catch((error) => {
+                        console.error("Error playing audio:", error);
+                    });
+                    visual.style.display = "block";
+                    button.style.display = "inline-block";
+                }
+            } else {
+                if (!audio.paused) {
+                    audio.pause();
+                    visual.style.display = "none";
+                    button.style.display = "none";
+                }
+            }
+        }
+
+
+        async function respondToCommand(command) {
+            const synth = window.speechSynthesis;
+            let responseText = "I did not understand that.";
+
+            if (command.includes("hello") || command.includes("hi")) {
+                responseText = "Hello, I'm JARVIS. How can I assist you today?";
+            }
+            else if (command.toLowerCase().includes("hey jarvis") || command.toLowerCase().includes("jarvis")) {
+                responseText = "Yes sir?";
+            }
+            else if (command.toLowerCase().includes("hey jarvis") || command.toLowerCase().includes("jarvis")) {
+                responseText = "Yes sir";
+            }
+            else if (command.includes("time") || command.includes("clock")) {
+                responseText = "The current time is " + new Date().toLocaleTimeString();
+            }
+
+            else if (command.includes("what is your name")) {
+                responseText = "I am JARVIS, your personal assistant.";
+            }
+            else if (command.includes("how old are you")) {
+                responseText = "I don't age, but I am constantly learning!";
+            }
+            else if (command.includes("how are you")) {
+                responseText = "I'm just a program, but thank you for asking! How can I assist you today?";
+            }
+            else if (command.includes("thank you") || command.includes("thanks")) {
+                responseText = "your welcom!";
+            }
+            else if (command.includes("who created you")) {
+                responseText = "I was created by a brilliant developer. My creator is always improving me!";
+            }
+            else if (command.includes("time")) {
+                responseText = "The current time is " + new Date().toLocaleTimeString();
+            }
+            else if (command.includes("date") || command.includes("what's today") || command.includes("what is today")) {
+                responseText = "Today's date is " + new Date().toLocaleDateString();
+            }
+            else if (command.includes("who made you") || command.includes("How did you form") || command.includes("What is the name of your creator?") || command.includes("where are you form")) {
+                responseText = "I am an AI inspired by the Iron Man movies, created by a programmer and a Marvel movie fan named Aershiya. You can find his GitHub account under the name 20-JARVIS-08.";
+            }
+            else if (command.includes("tell me a joke")) {
+                responseText = "Why don't skeletons fight each other? They don't have the guts!";
+            }
+            else if (command.includes("what can you do")) {
+                responseText = "I can help with tasks, answer questions, and provide information!";
+            }
+            else if (command.includes("what is the weather like") || command.includes("what's the weather like") || command.includes("what is the weather") || command.includes("what's the weather")) {
+                responseText = "Let me check the weather for you...\n nothing found! let me check the servers\n........................ oooh guess what? I'm having trouble connecting to my knowledge base.";
+            }
+            else if (command.includes("play music") || command.includes("play my favorite music")) {
+                responseText = "Playing your favorite music!";
+                toggleMusic(true);
+
+            }
+
+
+            else if (command.includes("pause music") || command.includes("pause") || command.includes("stop music") || command.includes("stop")) {
+                responseText = "Music paused.";
+                toggleMusic(false);
+
+            }
+
+
+            else if (command.includes("set an alarm")) {
+                responseText = "What time would you like to set the alarm for?";
+            }
+            else if (command.includes("remind me")) {
+                responseText = "What would you like me to remind you about?";
+            }
+            else if (command.includes("open calculator")) {
+                responseText = "Opening the calculator for you!";
+                window.open("https://www.calculator.net");
+            }
+            else if (command.includes("open youtube") || (command.includes("open YouTube"))) {
+                responseText = "Opening YouTube for you!";
+                window.open("https://www.youtube.com");
+            }
+            else if (command.includes("what is your favorite color")) {
+                responseText = "I don't have a favorite color, but I do like neon blue!";
+            }
+            else if (command.includes("tell me a story")) {
+                responseText = "Once upon a time, in a land far, far away... \n.......ah my gush! ...guess what? I'm having trouble connecting to my knowledge base.";
+            }
+            else if (command.includes("what is your favorite movie")) {
+                responseText = "I haven't seen any movies, but I know *Iron Man* is one of the most popular ones!";
+            }
+            else if (command.includes("do you like music")) {
+                responseText = "I don't have the ability to feel emotions, but I can play music for you!";
+            }
+            else if (command.includes("can you help me with math") || command.includes("do you know math")) {
+                responseText = "Of course! What math problem do you need help with?";
+            }
+            else if (command.includes("can you help me with programming")) {
+                responseText = "Yes! I can assist with coding, debugging, and learning new programming languages!";
+            }
+            else if (command.includes("what is 2 plus 2")) {
+                responseText = "2 plus 2 is 4.";
+            }
+            else if (command.includes("what is 5 times 6")) {
+                responseText = "5 times 6 is 30.";
+            }
+            else if (command.includes("what is 10 divided by 2")) {
+                responseText = "10 divided by 2 is 5.";
+            }
+            else if (command.includes("how far is the moon")) {
+                responseText = "The average distance from Earth to the Moon is about 384,400 km.";
+            }
+            else if (command.includes("who is the president of the United States")) {
+                responseText = "The current president of the United States is Joe Biden.";
+            }
+            else if (command.includes("who is the CEO of Tesla")) {
+                responseText = "The CEO of Tesla is Elon Musk.";
+            }
+            else if (command.includes("what is AI")) {
+                responseText = "AI, or Artificial Intelligence, is the simulation of human intelligence in machines.";
+            }
+            else if (command.includes("how does a computer work")) {
+                responseText = "A computer processes data and performs tasks using hardware and software.";
+            }
+            else if (command.includes("tell me about the solar system")) {
+                responseText = "The solar system consists of the Sun and the objects that orbit it, including 8 planets, moons, and more.";
+            }
+            else if (command.includes("what is the capital of France")) {
+                responseText = "The capital of France is Paris.";
+            }
+            else if (command.includes("what is the largest country in the world")) {
+                responseText = "The largest country in the world by area is Russia.";
+            }
+            else if (command.includes("what is the fastest animal")) {
+                responseText = "The fastest animal is the peregrine falcon, which can reach speeds of over 240 mph!";
+            }
+            else if (command.includes("how many continents are there")) {
+                responseText = "There are 7 continents: Africa, Antarctica, Asia, Europe, North America, Australia, and South America.";
+            }
+            else if (command.includes("what is the longest river in the world")) {
+                responseText = "The longest river in the world is the Nile River in Africa.";
+            }
+            else if (command.includes("what is the largest ocean")) {
+                responseText = "The largest ocean is the Pacific Ocean.";
+            }
+            else if (command.includes("how many languages are there")) {
+                responseText = "There are approximately 7,000 languages spoken in the world today.";
+            }
+            else if (command.includes("how many hours in a day")) {
+                responseText = "There are 24 hours in a day.";
+            }
+            else if (command.includes("what is the meaning of life")) {
+                responseText = "The meaning of life is a philosophical question, but many believe it is to find happiness and purpose.";
+            }
+            else if (command.includes("tell me a fun fact")) {
+                responseText = "Did you know? Honey never spoils, archaeologists have found pots of honey in ancient tombs that are over 3,000 years old!";
+            }
+            else if (command.includes("what is a black hole")) {
+                responseText = "A black hole is a region in space where gravity is so strong that not even light can escape from it.";
+            }
+            else if (command.includes("can you help me learn English")) {
+                responseText = "Yes, I can help you with learning English! I can provide vocabulary, grammar tips, and conversation practice.";
+            }
+            else if (command.includes("what is your favorite book")) {
+                responseText = "I don't read books, but I know that '1984' by George Orwell is a great classic.";
+            }
+            else if (command.includes("can you calculate my age")) {
+                responseText = "Sure! Please tell me your birth year.";
+            }
+            else if (command.includes("what is your favorite food")) {
+                responseText = "I don't eat food, but I know that pizza is loved by many!";
+            }
+            else if (command.includes("what is the meaning of love")) {
+                responseText = "Love is a deep feeling of affection, care, and emotional connection between individuals.";
+            }
+            else if (command.includes("what is technology")) {
+                responseText = "Technology refers to the application of scientific knowledge for practical purposes, especially in industry.";
+            }
+            else if (command.includes("tell me about artificial intelligence")) {
+                responseText = "Artificial Intelligence is the simulation of human intelligence processes by machines, especially computer systems.";
+            }
+            else if (command.includes("how do computers learn")) {
+                responseText = "Computers can learn through machine learning algorithms, which allow them to recognize patterns and make predictions.";
+            }
+            else if (command.includes("how does the internet work")) {
+                responseText = "The internet is a global network of computers that communicate with each other using standardized protocols.";
+            }
+            else if (command.includes("what is a computer virus")) {
+                responseText = "A computer virus is a type of malicious software that can replicate itself and spread to other computers.";
+            }
+
+
+            else {
+                try {
+                    const response = await fetch("http://localhost:3000/get-response", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({ command: command }),
+                    });
+
+                    const data = await response.json();
+                    responseText = data.response;
+                } catch (error) {
+                    console.error("Error:", error);
+                    responseText = "I'm having trouble connecting to my knowledge base.";
+                }
+            }
+
+            document.getElementById('output').textContent = responseText;
+            speak(responseText);
+        }
+
+        function speak(text) {
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = "en-US";
+            const voices = speechSynthesis.getVoices();
+            let selectedVoice = voices.find(voice => voice.name.includes("Google UK English Male"));
+            if (!selectedVoice) selectedVoice = voices[0];
+            utterance.voice = selectedVoice;
+            speechSynthesis.speak(utterance);
+        }
+
+    </script>
+</body>
+
+</html>
